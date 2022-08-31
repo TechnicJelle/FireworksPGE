@@ -1,7 +1,7 @@
 #include "Particle.h"
 #include "Utils.h"
 
-Particle::Particle(olc::PixelGameEngine* pge, bool rocket, float x, float y, float fuse)
+Particle::Particle(olc::PixelGameEngine* pge, bool rocket, float x, float y, float fuse, olc::Pixel colour)
 {
 	this->pge = pge;
 	this->rocket = rocket;
@@ -9,8 +9,10 @@ Particle::Particle(olc::PixelGameEngine* pge, bool rocket, float x, float y, flo
 	velocity = {0.0f, 0.0f};
 	acceleration = {0.0f, 0.0f};
 	mass = 1.0f;
-	this->fuse = fuse;
+	initialFuse = fuse;
+	this->fuse = initialFuse;
 	exploded = false;
+	this->colour = colour;
 }
 
 void Particle::ApplyForce(const olc::vf2d &force)
@@ -27,26 +29,30 @@ void Particle::Update(float fElapsedTime, std::vector<Particle>* sparkles)
 	acceleration = {0.0f, 0.0f};
 
 	fuse -= fElapsedTime;
-	if (rocket && fuse < 0.0f)
+	if (fuse < 0.0f)
 	{
-		Explode(sparkles);
+		exploded = true;
+		if (rocket)
+			Explode(sparkles);
 	}
 }
 
 void Particle::Render()
 {
-	pge->Draw(position, olc::RED);
+	colour.a = (unsigned char)(255.0f * (fuse / initialFuse));
+	pge->Draw(position, colour);
 }
 
 void Particle::Explode(std::vector<Particle>* sparkles)
 {
-	std::cout << "Explode" << std::endl;
-	for (int i = 0; i < 1; ++i)
+	const olc::Pixel colours[] = {olc::RED, olc::GREEN, olc::BLUE, olc::YELLOW, olc::MAGENTA, olc::CYAN};
+	olc::Pixel newColour = colours[rand() % 6];
+
+	for (int i = 0; i < (int)random(8, 13); ++i)
 	{
-		Particle sparkle = Particle(pge, false, position.x, position.y, 1.0f);
-		sparkle.ApplyForce({0.0f, -random(1000, 2000)});
+		Particle sparkle = Particle(pge, false, position.x, position.y, random(0.8f, 1.2f), newColour);
+		sparkle.ApplyForce({random(-1000, 1000), random(-1000, 1000)});
 
 		sparkles->push_back(sparkle);
 	}
-	exploded = true;
 }

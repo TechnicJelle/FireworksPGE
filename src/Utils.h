@@ -5,12 +5,13 @@
 
 #include "olcPixelGameEngine.h"
 
-float random(float Max)
+//TODO: Not inline these
+inline float random(float Max)
 {
 	return (float(rand()) / float(RAND_MAX)) * Max;
 }
 
-float random(float Min, float Max)
+inline float random(float Min, float Max)
 {
 	return ((float(rand()) / float(RAND_MAX)) * (Max - Min)) + Min;
 }

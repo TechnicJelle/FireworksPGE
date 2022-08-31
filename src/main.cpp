@@ -28,7 +28,7 @@ private:
 		float strength = random(6500, 11000);
 		float fuse = random(strength * 0.0003f, strength * 0.00055f);
 
-		Particle* p = new Particle(this, true, x, (float) ScreenHeight(), fuse);
+		Particle* p = new Particle(this, true, x, (float) ScreenHeight(), fuse, olc::YELLOW);
 		p->ApplyForce({0.0f, -strength});
 		return p;
 	}
@@ -85,6 +85,10 @@ public:
 				i.ApplyForce(gravity);
 				i.Update(dt, &sparkles);
 			}
+
+			//remove all exploded particles from the sparkles vector
+			sparkles.erase(std::remove_if(sparkles.begin(), sparkles.end(),
+										  [](Particle &i) { return i.exploded; }), sparkles.end());
 		}
 
 #pragma endregion // Physics

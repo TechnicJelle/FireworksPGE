@@ -15,10 +15,12 @@ private:
 	olc::vf2d velocity;
 	olc::vf2d acceleration;
 	float mass;
+	float initialFuse;
 	float fuse;
+	olc::Pixel colour;
 
 public:
-	Particle(olc::PixelGameEngine* pge, bool rocket, float x, float y, float fuse);
+	Particle(olc::PixelGameEngine* pge, bool rocket, float x, float y, float fuse, olc::Pixel colour);
 
 	void Update(float fElapsedTime, std::vector<Particle>* sparkles);
 
