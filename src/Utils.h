@@ -1,21 +1,22 @@
 #ifndef FIREWORKSPGE_UTILS_H
 #define FIREWORKSPGE_UTILS_H
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cert-msc50-cpp"
 
 #include "olcPixelGameEngine.h"
 
 //TODO: Not inline these
+//Call this once, before ever calling one of these `random()` functions
+inline void randomInit() {
+	srandom(time(nullptr));
+}
+
 inline float random(float Max)
 {
-	return (float(rand()) / float(RAND_MAX)) * Max;
+	return (float(random()) / float(RAND_MAX)) * Max;
 }
 
 inline float random(float Min, float Max)
 {
-	return ((float(rand()) / float(RAND_MAX)) * (Max - Min)) + Min;
+	return ((float(random()) / float(RAND_MAX)) * (Max - Min)) + Min;
 }
-
-#pragma clang diagnostic pop
 
 #endif //FIREWORKSPGE_UTILS_H
