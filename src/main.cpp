@@ -13,7 +13,6 @@ class FireworksPGE final : public olc::PixelGameEngine
 {
 public:
 	FireworksPGE()
-		: rockets{}
 	{
 		sAppName = "Fireworks";
 	}
@@ -21,24 +20,24 @@ public:
 	std::vector<Particle> sparkles;
 
 private:
-	Particle* rockets[50];
-	const olc::vf2d gravity = {0.0f, 10.0f};
+	std::array<Particle, 50> rockets;
+	const olc::vf2d gravity = { 0.0f, 10.0f };
 
-	Particle* CreateRocket()
+	Particle CreateRocket()
 	{
 		const float x = random(static_cast<float>(ScreenWidth()));
 		const float strength = random(6500.0f, 11000.0f);
 		const float fuse = random(strength * 0.0003f, strength * 0.00055f);
 
-		Particle* p = new Particle(this, true, x, static_cast<float>(ScreenHeight()), fuse, olc::YELLOW);
-		p->ApplyForce({0.0f, -strength});
+		Particle p(true, x, static_cast<float>(ScreenHeight()), fuse, olc::YELLOW);
+		p.ApplyForce({ 0.0f, -strength });
 		return p;
 	}
 
 public:
 	bool OnUserCreate() override
 	{
-		for (Particle*& i : rockets)
+		for (auto& i : rockets)
 		{
 			i = CreateRocket();
 		}
@@ -72,12 +71,12 @@ public:
 		while (accumulator >= dt)
 		{
 			accumulator -= dt;
-			for (Particle*& r : rockets)
+			for (auto& r : rockets)
 			{
-				r->ApplyForce(gravity);
-				r->Update(dt, &sparkles);
+				r.ApplyForce(gravity);
+				r.Update(dt, sparkles);
 
-				if (r->exploded)
+				if (r.exploded)
 				{
 					r = CreateRocket();
 				}
@@ -85,12 +84,12 @@ public:
 			for (Particle& s : sparkles)
 			{
 				s.ApplyForce(gravity);
-				s.Update(dt, &sparkles);
+				s.Update(dt, sparkles);
 			}
 
 			//remove all exploded particles from the sparkles vector
 			sparkles.erase(std::remove_if(sparkles.begin(), sparkles.end(),
-										  [](const Particle& i) { return i.exploded; }), sparkles.end());
+				[](const Particle& i) { return i.exploded; }), sparkles.end());
 		}
 
 #pragma endregion // Physics
@@ -99,13 +98,13 @@ public:
 #pragma region Rendering
 
 		Clear(olc::BLACK);
-		for (Particle*& r : rockets)
+		for (auto& r : rockets)
 		{
-			r->Render();
+			r.Render(*this);
 		}
 		for (Particle s : sparkles)
 		{
-			s.Render();
+			s.Render(*this);
 		}
 
 #pragma endregion // Rendering
@@ -122,6 +121,5 @@ int main()
 
 	return 0;
 }
-
 
 #pragma clang diagnostic pop
