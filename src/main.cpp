@@ -21,7 +21,7 @@ public:
 	std::vector<Particle> sparkles;
 
 private:
-	Particle* rockets[100];
+	Particle* rockets[50];
 	const olc::vf2d gravity = {0.0f, 10.0f};
 
 	Particle* CreateRocket()
