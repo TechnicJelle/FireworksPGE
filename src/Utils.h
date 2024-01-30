@@ -3,6 +3,8 @@
 
 #include "olcPixelGameEngine.h"
 
+//TODO: Move to new random, but keep in mind that `random()` doesn't work on Windows, while `rand()` does
+
 //TODO: Not inline these
 //Call this once, before ever calling one of these `random()` functions
 inline void randomInit() {
