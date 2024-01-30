@@ -9,7 +9,6 @@ class Particle
 public:
 	bool exploded;
 private:
-	olc::PixelGameEngine* pge;
 	bool rocket;
 	olc::vf2d position;
 	olc::vf2d velocity;
@@ -20,15 +19,17 @@ private:
 	olc::Pixel colour;
 
 public:
-	Particle(olc::PixelGameEngine* pge, bool rocket, float x, float y, float fuse, olc::Pixel colour);
+	Particle() = default;
 
-	void Update(float fElapsedTime, std::vector<Particle>* sparkles);
+	Particle(bool rocket, float x, float y, float fuse, olc::Pixel colour);
 
-	void Render();
+	void Update(float fElapsedTime, std::vector<Particle>& sparkles);
 
-	void ApplyForce(const olc::vf2d &force);
+	void Render(olc::PixelGameEngine& pge);
 
-	void Explode(std::vector<Particle>* sparkles) const;
+	void ApplyForce(const olc::vf2d& force);
+
+	void Explode(std::vector<Particle>& sparkles) const;
 };
 
 
