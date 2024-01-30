@@ -6,8 +6,8 @@
 #include "Utils.h"
 
 constexpr bool vsync = false;
-constexpr float physicsFPS = 200;
-constexpr float dt = 1 / physicsFPS;
+constexpr float physicsFPS = 200.0f;
+constexpr float dt = 1.0f / physicsFPS;
 
 class FireworksPGE final : public olc::PixelGameEngine
 {
