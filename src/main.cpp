@@ -5,30 +5,32 @@
 #include "Particle.h"
 #include "Utils.h"
 
-const bool vsync = false;
-const float physicsFPS = 200;
-const float dt = 1 / physicsFPS;
+constexpr bool vsync = false;
+constexpr float physicsFPS = 200;
+constexpr float dt = 1 / physicsFPS;
 
-class FireworksPGE : public olc::PixelGameEngine
+class FireworksPGE final : public olc::PixelGameEngine
 {
 public:
 	FireworksPGE()
+		: rockets{}
 	{
 		sAppName = "Fireworks";
 	}
 
 	std::vector<Particle> sparkles;
+
 private:
 	Particle* rockets[100];
 	const olc::vf2d gravity = {0.0f, 10.0f};
 
 	Particle* CreateRocket()
 	{
-		float x = random((float) ScreenWidth());
-		float strength = random(6500, 11000);
-		float fuse = random(strength * 0.0003f, strength * 0.00055f);
+		const float x = random(static_cast<float>(ScreenWidth()));
+		const float strength = random(6500.0f, 11000.0f);
+		const float fuse = random(strength * 0.0003f, strength * 0.00055f);
 
-		Particle* p = new Particle(this, true, x, (float) ScreenHeight(), fuse, olc::YELLOW);
+		Particle* p = new Particle(this, true, x, static_cast<float>(ScreenHeight()), fuse, olc::YELLOW);
 		p->ApplyForce({0.0f, -strength});
 		return p;
 	}
@@ -36,7 +38,7 @@ private:
 public:
 	bool OnUserCreate() override
 	{
-		for (Particle*&i : rockets)
+		for (Particle*& i : rockets)
 		{
 			i = CreateRocket();
 		}
@@ -48,7 +50,7 @@ public:
 
 	float accumulator = 0.0f;
 
-	bool OnUserUpdate(float fElapsedTime) override
+	bool OnUserUpdate(const float fElapsedTime) override
 	{
 		if (GetKey(olc::Key::ESCAPE).bPressed)
 		{
@@ -70,25 +72,25 @@ public:
 		while (accumulator >= dt)
 		{
 			accumulator -= dt;
-			for (Particle*&i : rockets)
+			for (Particle*& r : rockets)
 			{
-				i->ApplyForce(gravity);
-				i->Update(dt, &sparkles);
+				r->ApplyForce(gravity);
+				r->Update(dt, &sparkles);
 
-				if (i->exploded)
+				if (r->exploded)
 				{
-					i = CreateRocket();
+					r = CreateRocket();
 				}
 			}
-			for (Particle &i : sparkles)
+			for (Particle& s : sparkles)
 			{
-				i.ApplyForce(gravity);
-				i.Update(dt, &sparkles);
+				s.ApplyForce(gravity);
+				s.Update(dt, &sparkles);
 			}
 
 			//remove all exploded particles from the sparkles vector
 			sparkles.erase(std::remove_if(sparkles.begin(), sparkles.end(),
-										  [](Particle &i) { return i.exploded; }), sparkles.end());
+										  [](const Particle& i) { return i.exploded; }), sparkles.end());
 		}
 
 #pragma endregion // Physics
@@ -97,13 +99,13 @@ public:
 #pragma region Rendering
 
 		Clear(olc::BLACK);
-		for (Particle*&i : rockets)
+		for (Particle*& r : rockets)
 		{
-			i->Render();
+			r->Render();
 		}
-		for (Particle i : sparkles)
+		for (Particle s : sparkles)
 		{
-			i.Render();
+			s.Render();
 		}
 
 #pragma endregion // Rendering
@@ -115,8 +117,7 @@ public:
 
 int main()
 {
-	FireworksPGE game;
-	if (game.Construct(320, 180, 4, 4, false, vsync))
+	if (FireworksPGE game; game.Construct(320, 180, 4, 4, false, vsync))
 		game.Start();
 
 	return 0;

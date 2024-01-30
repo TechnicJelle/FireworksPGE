@@ -28,7 +28,7 @@ public:
 
 	void ApplyForce(const olc::vf2d &force);
 
-	void Explode(std::vector<Particle>* sparkles);
+	void Explode(std::vector<Particle>* sparkles) const;
 };
 
 
