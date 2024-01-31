@@ -3,7 +3,7 @@
 .vs/
 build/
 bin/
-cmake-build-debug/
+cmake-build-*/
 CMakeCache.txt
 CMakeFiles/
 Makefile
