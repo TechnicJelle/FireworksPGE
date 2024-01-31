@@ -36,32 +36,37 @@ void Particle::Update(const float fElapsedTime, std::vector<Particle>& sparkles)
 	velocity += fElapsedTime / 2 * acceleration;
 	position += velocity * fElapsedTime;
 	velocity += fElapsedTime / 2 * acceleration;
-	acceleration = { 0.0f, 0.0f };
+	acceleration = {0.0f, 0.0f};
 
 	fuse -= fElapsedTime;
 	if (fuse < 0.0f)
 	{
-		exploded = true;
-		if (rocket)
+		isExploded = true;
+		if (isRocket)
 			Explode(sparkles);
 	}
 }
 
 void Particle::Render(olc::PixelGameEngine& pge)
 {
-	colour.a = static_cast<unsigned char>(255.0f * (fuse / initialFuse));
+	colour.a = static_cast<uint8_t>(255.0f * (fuse / initialFuse));
 	pge.Draw(position, colour);
+}
+
+bool Particle::IsExploded() const
+{
+	return isExploded;
 }
 
 void Particle::Explode(std::vector<Particle>& sparkles) const
 {
-	const olc::Pixel colours[] = { olc::RED, olc::GREEN, olc::BLUE, olc::YELLOW, olc::MAGENTA, olc::CYAN };
+	const olc::Pixel colours[] = {olc::RED, olc::GREEN, olc::BLUE, olc::YELLOW, olc::MAGENTA, olc::CYAN};
 	const olc::Pixel newColour = colours[random(6)];
 
 	for (int i = 0; i < random(10, 20); ++i)
 	{
 		Particle sparkle(false, position.x, position.y, random(0.8f, 1.2f), newColour);
-		olc::vf2d direction = { random(-1.0f, 1.0f), random(-1.0f, 1.0f) };
+		olc::vf2d direction = {random(-1.0f, 1.0f), random(-1.0f, 1.0f)};
 		direction = direction.norm();
 		sparkle.ApplyForce(direction * random(5000.0f, 8000.0f));
 

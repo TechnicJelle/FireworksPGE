@@ -6,24 +6,22 @@
 
 class Particle
 {
-public:
-	bool exploded;
-private:
-	bool rocket;
+	bool isExploded = false;
+	bool isRocket = true;
 	olc::vf2d position;
 	olc::vf2d velocity;
 	olc::vf2d acceleration;
-	float mass;
-	float initialFuse;
-	float fuse;
+	float mass = 1.0f;
+	float initialFuse{};
+	float fuse{};
 	olc::Pixel colour;
 
 public:
 	Particle() = default;
 
-	Particle(bool rocket, float x, float y, float fuse, olc::Pixel colour);
 	static Particle CreateRocket(const olc::PixelGameEngine& pge);
 
+	Particle(bool isRocket, float x, float y, float fuse, olc::Pixel colour);
 
 	void Update(float fElapsedTime, std::vector<Particle>& sparkles);
 
@@ -31,6 +29,9 @@ public:
 
 	void ApplyForce(const olc::vf2d& force);
 
+	[[nodiscard]] bool IsExploded() const;
+
+private:
 	void Explode(std::vector<Particle>& sparkles) const;
 };
 

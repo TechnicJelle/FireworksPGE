@@ -1,9 +1,5 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cppcoreguidelines-pro-type-member-init"
-
 #include "olcPixelGameEngine.h"
 #include "Particle.h"
-#include "Utils.h"
 
 constexpr bool vsync = false;
 constexpr float physicsFPS = 200.0f;
@@ -17,11 +13,10 @@ public:
 		sAppName = "Fireworks";
 	}
 
-	std::vector<Particle> sparkles;
-
 private:
 	std::array<Particle, 50> rockets;
-	const olc::vf2d gravity = { 0.0f, 10.0f };
+	std::vector<Particle> sparkles;
+	const olc::vf2d gravity = {0.0f, 10.0f};
 
 public:
 	bool OnUserCreate() override
@@ -30,8 +25,6 @@ public:
 		{
 			i = Particle::CreateRocket(*this);
 		}
-
-		sparkles = std::vector<Particle>();
 
 		return true;
 	}
@@ -60,12 +53,12 @@ public:
 		while (accumulator >= dt)
 		{
 			accumulator -= dt;
-			for (auto& r : rockets)
+			for (Particle& r : rockets)
 			{
 				r.ApplyForce(gravity);
 				r.Update(dt, sparkles);
 
-				if (r.exploded)
+				if (r.IsExploded())
 				{
 					r = Particle::CreateRocket(*this);
 				}
@@ -77,8 +70,14 @@ public:
 			}
 
 			//remove all exploded particles from the sparkles vector
-			sparkles.erase(std::remove_if(sparkles.begin(), sparkles.end(),
-				[](const Particle& i) { return i.exploded; }), sparkles.end());
+			sparkles.erase(
+				std::remove_if(
+					sparkles.begin(),
+					sparkles.end(),
+					[](const Particle& i) { return i.IsExploded(); }
+				),
+				sparkles.end()
+			);
 		}
 
 #pragma endregion // Physics
@@ -87,11 +86,11 @@ public:
 #pragma region Rendering
 
 		Clear(olc::BLACK);
-		for (auto& r : rockets)
+		for (Particle& r : rockets)
 		{
 			r.Render(*this);
 		}
-		for (Particle s : sparkles)
+		for (Particle& s : sparkles)
 		{
 			s.Render(*this);
 		}
@@ -110,5 +109,3 @@ int main()
 
 	return 0;
 }
-
-#pragma clang diagnostic pop
