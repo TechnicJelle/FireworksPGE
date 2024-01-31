@@ -1,5 +1,6 @@
 #include "olcPixelGameEngine.h"
 #include "Particle.h"
+#include "Utils.h"
 
 constexpr bool vsync = false;
 constexpr float physicsFPS = 200.0f;
@@ -21,6 +22,8 @@ private:
 public:
 	bool OnUserCreate() override
 	{
+		randomInit();
+
 		for (auto& i : rockets)
 		{
 			i = Particle::CreateRocket(*this);
