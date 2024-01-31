@@ -1,17 +1,28 @@
 #include "Particle.h"
 #include "Utils.h"
 
-Particle::Particle(const bool rocket, float x, float y, const float fuse, const olc::Pixel colour)
+Particle Particle::CreateRocket(const olc::PixelGameEngine& pge)
 {
-	this->rocket = rocket;
-	position = { x, y };
-	velocity = { 0.0f, 0.0f };
-	acceleration = { 0.0f, 0.0f };
-	mass = 1.0f;
-	initialFuse = fuse;
-	this->fuse = initialFuse;
-	exploded = false;
-	this->colour = colour;
+	const float x = random(static_cast<float>(pge.ScreenWidth()));
+	const float y = static_cast<float>(pge.ScreenHeight());
+
+	const float strength = random(6500.0f, 11000.0f);
+	const float fuse = random(strength * 0.0003f, strength * 0.00055f);
+
+	Particle p(true, x, y, fuse, olc::YELLOW);
+	p.ApplyForce({0.0f, -strength});
+	return p;
+}
+
+Particle::Particle(const bool isRocket,
+				   const float x, const float y,
+				   const float fuse,
+				   const olc::Pixel colour)
+	: isRocket{isRocket},
+	  position{x, y}, velocity{0.0f, 0.0f}, acceleration{0.0f, 0.0f},
+	  initialFuse{fuse}, fuse{fuse},
+	  colour{colour}
+{
 }
 
 void Particle::ApplyForce(const olc::vf2d& force)

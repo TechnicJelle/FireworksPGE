@@ -22,6 +22,8 @@ public:
 	Particle() = default;
 
 	Particle(bool rocket, float x, float y, float fuse, olc::Pixel colour);
+	static Particle CreateRocket(const olc::PixelGameEngine& pge);
+
 
 	void Update(float fElapsedTime, std::vector<Particle>& sparkles);
 

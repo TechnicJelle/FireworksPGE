@@ -23,23 +23,12 @@ private:
 	std::array<Particle, 50> rockets;
 	const olc::vf2d gravity = { 0.0f, 10.0f };
 
-	Particle CreateRocket()
-	{
-		const float x = random(static_cast<float>(ScreenWidth()));
-		const float strength = random(6500.0f, 11000.0f);
-		const float fuse = random(strength * 0.0003f, strength * 0.00055f);
-
-		Particle p(true, x, static_cast<float>(ScreenHeight()), fuse, olc::YELLOW);
-		p.ApplyForce({ 0.0f, -strength });
-		return p;
-	}
-
 public:
 	bool OnUserCreate() override
 	{
 		for (auto& i : rockets)
 		{
-			i = CreateRocket();
+			i = Particle::CreateRocket(*this);
 		}
 
 		sparkles = std::vector<Particle>();
@@ -78,7 +67,7 @@ public:
 
 				if (r.exploded)
 				{
-					r = CreateRocket();
+					r = Particle::CreateRocket(*this);
 				}
 			}
 			for (Particle& s : sparkles)
