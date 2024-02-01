@@ -15,9 +15,12 @@ public:
 	}
 
 private:
+	const olc::vf2d gravity = {0.0f, 10.0f};
+
 	std::array<Particle, 50> rockets;
 	std::vector<Particle> sparkles;
-	const olc::vf2d gravity = {0.0f, 10.0f};
+
+	float accumulator = 0.0f;
 
 public:
 	bool OnUserCreate() override
@@ -31,8 +34,6 @@ public:
 
 		return true;
 	}
-
-	float accumulator = 0.0f;
 
 	bool OnUserUpdate(const float fElapsedTime) override
 	{
