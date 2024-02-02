@@ -35,6 +35,12 @@ set(C_CXX_HEADERS_DIR "include")
 #
 set(ASSETS_DIR "assets")
 
+#
+# EnTT
+add_subdirectory(include/entt/)
+link_libraries(EnTT::EnTT)
+
+
 ##########################################################################
 # DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING!!       #
 ##########################################################################
