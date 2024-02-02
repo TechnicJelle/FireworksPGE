@@ -42,7 +42,6 @@ struct Gravity
 struct Renderer
 {
 	olc::Pixel colour = olc::WHITE;
-	int32_t radius = 1;
 };
 
 class Fuse
@@ -178,7 +177,7 @@ private:
 			{
 				olc::Pixel colour = rend.colour; // copy
 				colour.a = static_cast<uint8_t>(fuse.GetFraction() * 255); // fade out
-				FillCircle(pos.position, rend.radius, colour);
+				Draw(pos.position, colour);
 			}
 		}
 #pragma endregion // Rendering
@@ -194,7 +193,7 @@ private:
 		const float y = static_cast<float>(pge.ScreenHeight());
 		registry.emplace<Position>(rocket, olc::vf2d(x, y));
 
-		registry.emplace<Renderer>(rocket, olc::YELLOW, 0);
+		registry.emplace<Renderer>(rocket, olc::YELLOW);
 
 		Movement& mov = registry.emplace<Movement>(rocket);
 		const float launchStrength = random(6500.0f, 11000.0f);
@@ -217,7 +216,7 @@ private:
 
 		registry.emplace<Position>(sparkle, position);
 
-		registry.emplace<Renderer>(sparkle, colour, 0);
+		registry.emplace<Renderer>(sparkle, colour);
 
 		Movement& mov = registry.emplace<Movement>(sparkle);
 		olc::vf2d direction = {random(-1.0f, 1.0f), random(-1.0f, 1.0f)};
