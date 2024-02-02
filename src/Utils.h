@@ -8,7 +8,7 @@
 //TODO: Not inline these
 //Call this once, before ever calling one of these `random()` functions
 inline void randomInit() {
-	srand(time(nullptr));
+	srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 inline float random(const float max)
