@@ -71,6 +71,12 @@ public:
 	}
 };
 
+struct Explode
+{
+	uint8_t numSparkles = 1;
+	olc::Pixel colour = olc::WHITE;
+};
+
 class FireworksPGE final : public olc::PixelGameEngine
 {
 public:
@@ -91,7 +97,7 @@ private:
 
 		for (int i = 0; i < 50; i++)
 		{
-			CreateRocket(registry);
+			CreateNewRocket(registry, *this);
 		}
 
 		return true;
@@ -135,10 +141,28 @@ private:
 				for (auto [entity, fuse] : fuseView.each())
 				{
 					fuse.DecrementTime(dt);
+				}
+
+				const auto explodeView = registry.view<const Fuse, Explode, const Position>();
+				for (auto [entity, fuse, explode, pos] : explodeView.each())
+				{
+					if (fuse.IsExpired())
+					{
+						for (int i = 0; i < explode.numSparkles; i++)
+						{
+							CreateNewSparkle(registry, pos.position, explode.colour);
+						}
+
+						CreateNewRocket(registry, *this);
+					}
+				}
+
+				//Clean up expired entities
+				for (auto [entity, fuse] : fuseView.each())
+				{
 					if (fuse.IsExpired())
 					{
 						registry.destroy(entity);
-						CreateRocket(registry);
 					}
 				}
 			}
@@ -162,24 +186,48 @@ private:
 		return true;
 	}
 
-	void CreateRocket(entt::registry& registry) const
+	static void CreateNewRocket(entt::registry& registry, const PixelGameEngine& pge)
 	{
-		const entt::entity entity = registry.create();
+		const entt::entity rocket = registry.create();
 
-		const float x = random(static_cast<float>(ScreenWidth()));
-		const float y = static_cast<float>(ScreenHeight());
-		registry.emplace<Position>(entity, olc::vf2d(x, y));
+		const float x = random(static_cast<float>(pge.ScreenWidth()));
+		const float y = static_cast<float>(pge.ScreenHeight());
+		registry.emplace<Position>(rocket, olc::vf2d(x, y));
 
-		registry.emplace<Renderer>(entity, olc::YELLOW, 0);
+		registry.emplace<Renderer>(rocket, olc::YELLOW, 0);
 
-		Movement& mov = registry.emplace<Movement>(entity);
-		const float strength = random(6500.0f, 11000.0f);
-		mov.ApplyForce({0.0f, -strength});
+		Movement& mov = registry.emplace<Movement>(rocket);
+		const float launchStrength = random(6500.0f, 11000.0f);
+		mov.ApplyForce({0.0f, -launchStrength});
 
-		registry.emplace<Gravity>(entity);
+		registry.emplace<Gravity>(rocket);
 
-		const float fuse = random(strength * 0.0003f, strength * 0.00055f);
-		registry.emplace<Fuse>(entity, fuse);
+		const float fuse = random(launchStrength * 0.0003f, launchStrength * 0.00055f);
+		registry.emplace<Fuse>(rocket, fuse);
+
+		const long numSparkles = random(10, 20);
+		const olc::Pixel colours[] = {olc::RED, olc::GREEN, olc::BLUE, olc::YELLOW, olc::MAGENTA, olc::CYAN};
+		const olc::Pixel sparklesColour = colours[random(6)];
+		registry.emplace<Explode>(rocket, numSparkles, sparklesColour);
+	}
+
+	static void CreateNewSparkle(entt::registry& registry, const olc::vf2d& position, olc::Pixel colour)
+	{
+		const entt::entity sparkle = registry.create();
+
+		registry.emplace<Position>(sparkle, position);
+
+		registry.emplace<Renderer>(sparkle, colour, 0);
+
+		Movement& mov = registry.emplace<Movement>(sparkle);
+		olc::vf2d direction = {random(-1.0f, 1.0f), random(-1.0f, 1.0f)};
+		direction = direction.norm();
+		mov.ApplyForce(direction * random(5000.0f, 8000.0f));
+
+		registry.emplace<Gravity>(sparkle);
+
+		const float fuseTime = random(0.8f, 1.2f);
+		registry.emplace<Fuse>(sparkle, fuseTime);
 	}
 };
 
