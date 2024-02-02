@@ -55,9 +55,9 @@ public:
 	{
 	}
 
-	void DecrementTime(const float dt)
+	void DecrementTime(const float fElapsedTime)
 	{
-		time -= dt;
+		time -= fElapsedTime;
 	}
 
 	[[nodiscard]] bool IsExpired() const
