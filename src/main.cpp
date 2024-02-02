@@ -35,6 +35,16 @@ public:
 	}
 };
 
+struct Gravity
+{
+};
+
+struct Renderer
+{
+	olc::Pixel colour = olc::WHITE;
+	int32_t radius = 1;
+};
+
 class Fuse
 {
 	float initialTime;
@@ -61,12 +71,6 @@ public:
 	}
 };
 
-struct Renderer
-{
-	olc::Pixel colour = olc::WHITE;
-	int32_t radius = 1;
-};
-
 class FireworksPGE final : public olc::PixelGameEngine
 {
 public:
@@ -76,7 +80,7 @@ public:
 	}
 
 private:
-	const olc::vf2d gravity = {0.0f, 10.0f};
+	const olc::vf2d gravityForce = {0.0f, 10.0f};
 
 	entt::registry registry;
 	float accumulator = 0.0f;
@@ -118,8 +122,13 @@ private:
 				const auto movementView = registry.view<Movement, Position>();
 				for (auto [entity, mov, pos] : movementView.each())
 				{
-					mov.ApplyForce(gravity);
 					mov.Update(pos, dt);
+				}
+
+				const auto gravityView = registry.view<Movement, const Gravity>();
+				for (auto [entity, mov] : gravityView.each())
+				{
+					mov.ApplyForce(gravityForce);
 				}
 
 				const auto fuseView = registry.view<Fuse>();
@@ -166,6 +175,8 @@ private:
 		Movement& mov = registry.emplace<Movement>(entity);
 		const float strength = random(6500.0f, 11000.0f);
 		mov.ApplyForce({0.0f, -strength});
+
+		registry.emplace<Gravity>(entity);
 
 		const float fuse = random(strength * 0.0003f, strength * 0.00055f);
 		registry.emplace<Fuse>(entity, fuse);
