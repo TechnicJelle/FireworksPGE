@@ -94,7 +94,7 @@ private:
 	{
 		randomInit();
 
-		for (int i = 0; i < 50; i++)
+		for (uint32_t i = 0; i < 50; i++)
 		{
 			CreateNewRocket(registry, *this);
 		}
@@ -147,7 +147,7 @@ private:
 				{
 					if (fuse.IsExpired())
 					{
-						for (int i = 0; i < explode.numSparkles; i++)
+						for (uint8_t i = 0; i < explode.numSparkles; i++)
 						{
 							CreateNewSparkle(registry, pos.position, explode.colour);
 						}
@@ -204,7 +204,7 @@ private:
 		const float fuse = random(launchStrength * 0.0003f, launchStrength * 0.00055f);
 		registry.emplace<Fuse>(rocket, fuse);
 
-		const long numSparkles = random(10, 20);
+		const uint8_t numSparkles = static_cast<uint8_t>(random(10, 20));
 		const olc::Pixel colours[] = {olc::RED, olc::GREEN, olc::BLUE, olc::YELLOW, olc::MAGENTA, olc::CYAN};
 		const olc::Pixel sparklesColour = colours[random(6)];
 		registry.emplace<Explode>(rocket, numSparkles, sparklesColour);

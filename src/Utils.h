@@ -21,12 +21,12 @@ inline float random(const float min, const float max)
 	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (max - min) + min;
 }
 
-inline long random(const int max)
+inline int random(const int max)
 {
 	return rand() % max;
 }
 
-inline long random(const int min, const int max)
+inline int random(const int min, const int max)
 {
 	return rand() % (max - min) + min;
 }
