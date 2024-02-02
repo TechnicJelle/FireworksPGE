@@ -40,6 +40,7 @@ class Fuse
 	float initialTime;
 	float time;
 
+public:
 	explicit Fuse(const float time) : initialTime(time), time(time)
 	{
 	}
