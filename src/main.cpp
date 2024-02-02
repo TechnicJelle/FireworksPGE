@@ -35,10 +35,6 @@ public:
 	}
 };
 
-struct Gravity
-{
-};
-
 struct Renderer
 {
 	olc::Pixel colour = olc::WHITE;
@@ -127,13 +123,8 @@ private:
 				const auto movementView = registry.view<Movement, Position>();
 				for (auto [entity, mov, pos] : movementView.each())
 				{
-					mov.Update(pos, dt);
-				}
-
-				const auto gravityView = registry.view<Movement, const Gravity>();
-				for (auto [entity, mov] : gravityView.each())
-				{
 					mov.ApplyForce(gravityForce);
+					mov.Update(pos, dt);
 				}
 
 				const auto fuseView = registry.view<Fuse>();
@@ -199,8 +190,6 @@ private:
 		const float launchStrength = random(6500.0f, 11000.0f);
 		mov.ApplyForce({0.0f, -launchStrength});
 
-		registry.emplace<Gravity>(rocket);
-
 		const float fuse = random(launchStrength * 0.0003f, launchStrength * 0.00055f);
 		registry.emplace<Fuse>(rocket, fuse);
 
@@ -223,7 +212,6 @@ private:
 		direction = direction.norm();
 		mov.ApplyForce(direction * random(5000.0f, 8000.0f));
 
-		registry.emplace<Gravity>(sparkle);
 
 		const float fuseTime = random(0.8f, 1.2f);
 		registry.emplace<Fuse>(sparkle, fuseTime);
