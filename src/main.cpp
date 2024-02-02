@@ -44,6 +44,21 @@ public:
 	explicit Fuse(const float time) : initialTime(time), time(time)
 	{
 	}
+
+	void DecrementTime(const float dt)
+	{
+		time -= dt;
+	}
+
+	[[nodiscard]] bool IsExpired() const
+	{
+		return time <= 0.0f;
+	}
+
+	[[nodiscard]] float GetFraction() const
+	{
+		return time / initialTime;
+	}
 };
 
 struct Renderer
@@ -100,11 +115,22 @@ private:
 			while (accumulator >= dt)
 			{
 				accumulator -= dt;
-				const auto view = registry.view<Movement, Position>();
-				for (auto [entity, mov, pos] : view.each())
+				const auto movementView = registry.view<Movement, Position>();
+				for (auto [entity, mov, pos] : movementView.each())
 				{
 					mov.ApplyForce(gravity);
 					mov.Update(pos, dt);
+				}
+
+				const auto fuseView = registry.view<Fuse>();
+				for (auto [entity, fuse] : fuseView.each())
+				{
+					fuse.DecrementTime(dt);
+					if (fuse.IsExpired())
+					{
+						registry.destroy(entity);
+						CreateRocket(registry);
+					}
 				}
 			}
 		}
@@ -113,10 +139,13 @@ private:
 #pragma region Rendering
 		{
 			Clear(olc::BLACK);
-			const auto view = registry.view<const Position, const Renderer>();
-			for (auto [entity, pos, rend] : view.each())
+
+			const auto view = registry.view<const Position, const Renderer, const Fuse>();
+			for (auto [entity, pos, rend, fuse] : view.each())
 			{
-				FillCircle(pos.position, rend.radius, rend.colour);
+				olc::Pixel colour = rend.colour; // copy
+				colour.a = static_cast<uint8_t>(fuse.GetFraction() * 255); // fade out
+				FillCircle(pos.position, rend.radius, colour);
 			}
 		}
 #pragma endregion // Rendering
