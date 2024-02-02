@@ -48,13 +48,12 @@ public:
 
 struct Renderer
 {
-	olc::Pixel color = olc::WHITE;
+	olc::Pixel colour = olc::WHITE;
 	int32_t radius = 1;
 };
 
 class FireworksPGE final : public olc::PixelGameEngine
 {
-
 public:
 	FireworksPGE()
 	{
@@ -117,7 +116,7 @@ private:
 			const auto view = registry.view<const Position, const Renderer>();
 			for (auto [entity, pos, rend] : view.each())
 			{
-				FillCircle(pos.position, rend.radius, rend.color);
+				FillCircle(pos.position, rend.radius, rend.colour);
 			}
 		}
 #pragma endregion // Rendering
