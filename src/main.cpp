@@ -1,5 +1,6 @@
 #include "olcPixelGameEngine.h"
 #include "Particle.h"
+#include "Rocket.hpp"
 #include "Utils.h"
 
 constexpr bool vsync = false;
@@ -17,7 +18,7 @@ public:
 private:
 	const olc::vf2d gravity = {0.0f, 10.0f};
 
-	std::array<Particle, 50> rockets;
+	std::array<Rocket, 50> rockets;
 	std::vector<Particle> sparkles;
 
 	float accumulator = 0.0f;
@@ -27,9 +28,9 @@ public:
 	{
 		randomInit();
 
-		for (auto& i : rockets)
+		for (Rocket& r : rockets)
 		{
-			i = Particle::CreateRocket(*this);
+			r = Rocket::CreateNewRocket(*this);
 		}
 
 		return true;
@@ -57,20 +58,20 @@ public:
 		while (accumulator >= dt)
 		{
 			accumulator -= dt;
-			for (Particle& r : rockets)
+			for (Rocket& r : rockets)
 			{
 				r.ApplyForce(gravity);
 				r.Update(dt, sparkles);
 
 				if (r.IsExploded())
 				{
-					r = Particle::CreateRocket(*this);
+					r = Rocket::CreateNewRocket(*this);
 				}
 			}
 			for (Particle& s : sparkles)
 			{
 				s.ApplyForce(gravity);
-				s.Update(dt, sparkles);
+				s.Update(dt);
 			}
 
 			//remove all exploded particles from the sparkles vector
@@ -90,7 +91,7 @@ public:
 #pragma region Rendering
 
 		Clear(olc::BLACK);
-		for (Particle& r : rockets)
+		for (Rocket& r : rockets)
 		{
 			r.Render(*this);
 		}

@@ -6,8 +6,6 @@
 
 class Particle
 {
-	bool isExploded = false;
-	bool isRocket = true;
 	olc::vf2d position;
 	olc::vf2d velocity;
 	olc::vf2d acceleration;
@@ -16,14 +14,15 @@ class Particle
 	float fuse{};
 	olc::Pixel colour;
 
+protected:
+	Particle(float x, float y, float fuse, olc::Pixel colour);
+
 public:
 	Particle() = default;
 
-	static Particle CreateRocket(const olc::PixelGameEngine& pge);
+	static Particle CreateNewSparkle(const olc::vf2d& position, olc::Pixel colour);
 
-	Particle(bool isRocket, float x, float y, float fuse, olc::Pixel colour);
-
-	void Update(float fElapsedTime, std::vector<Particle>& sparkles);
+	void Update(float fElapsedTime);
 
 	void Render(olc::PixelGameEngine& pge);
 
@@ -31,8 +30,8 @@ public:
 
 	[[nodiscard]] bool IsExploded() const;
 
-private:
-	void Explode(std::vector<Particle>& sparkles) const;
+protected:
+	[[nodiscard]] olc::vf2d GetPosition() const;
 };
 
 
