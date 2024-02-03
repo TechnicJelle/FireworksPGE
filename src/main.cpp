@@ -1,5 +1,6 @@
-#include "olcPixelGameEngine.h"
-#include "Particle.h"
+#include <olcPixelGameEngine.h>
+
+#include "Particle.hpp"
 #include "Rocket.hpp"
 #include "Utils.h"
 
@@ -18,8 +19,7 @@ public:
 private:
 	const olc::vf2d gravity = {0.0f, 10.0f};
 
-	std::array<Rocket, 50> rockets;
-	std::vector<Particle> sparkles;
+	std::vector<std::unique_ptr<Particle>> particles;
 
 	float accumulator = 0.0f;
 
@@ -28,9 +28,11 @@ public:
 	{
 		randomInit();
 
-		for (Rocket& r : rockets)
+		constexpr int numRockets = 50;
+		particles.reserve(numRockets);
+		for (int i = 0; i < numRockets; ++i)
 		{
-			r = Rocket::CreateNewRocket(*this);
+			particles.push_back(Rocket::CreateNewRocket(*this));
 		}
 
 		return true;
@@ -58,30 +60,37 @@ public:
 		while (accumulator >= dt)
 		{
 			accumulator -= dt;
-			for (Rocket& r : rockets)
-			{
-				r.ApplyForce(gravity);
-				r.Update(dt, sparkles);
 
-				if (r.IsExploded())
-				{
-					r = Rocket::CreateNewRocket(*this);
-				}
-			}
-			for (Particle& s : sparkles)
+			//not using an iterator (for-each), because we add stuff to the vector, which resizes it, invalidating the iterator
+			for (int i = 0; i < particles.size(); i++)
 			{
-				s.ApplyForce(gravity);
-				s.Update(dt);
+				const auto& p = particles[i];
+
+				p->ApplyForce(gravity);
+				auto newParticles = p->Update(dt);
+
+				if (!newParticles.empty()) //a rocket has exploded
+				{
+					//so we add a new rocket to replace the exploded one
+					newParticles.push_back(Rocket::CreateNewRocket(*this));
+				}
+
+				particles.insert(
+					particles.end(),
+					std::make_move_iterator(newParticles.begin()),
+					std::make_move_iterator(newParticles.end())
+				);
 			}
 
 			//remove all exploded particles from the sparkles vector
-			sparkles.erase(
+			//TODO: Replace with C++ 20 erase_if
+			particles.erase(
 				std::remove_if(
-					sparkles.begin(),
-					sparkles.end(),
-					[](const Particle& i) { return i.IsExploded(); }
+					particles.begin(),
+					particles.end(),
+					[](const std::unique_ptr<Particle>& p) { return p->IsFizzledOut(); }
 				),
-				sparkles.end()
+				particles.end()
 			);
 		}
 
@@ -91,13 +100,9 @@ public:
 #pragma region Rendering
 
 		Clear(olc::BLACK);
-		for (Rocket& r : rockets)
+		for (const auto& p : particles)
 		{
-			r.Render(*this);
-		}
-		for (Particle& s : sparkles)
-		{
-			s.Render(*this);
+			p->Render(*this);
 		}
 
 #pragma endregion // Rendering

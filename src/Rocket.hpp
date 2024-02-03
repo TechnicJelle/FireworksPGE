@@ -1,22 +1,24 @@
-#ifndef ROCKET_HPP
-#define ROCKET_HPP
-
-#include "Particle.h"
+#ifndef FIREWORKSPGE_ROCKET_HPP
+#define FIREWORKSPGE_ROCKET_HPP
 
 
-class Rocket : public Particle {
-	Rocket(float x, float y, float fuse);
+#include "Particle.hpp" //extends
 
+
+class Rocket final : public Particle
+{
 public:
 	Rocket() = default;
 
-	static Rocket CreateNewRocket(const olc::PixelGameEngine& pge);
+	Rocket(float x, float y, float fuse);
 
-	void Update(float fElapsedTime, std::vector<Particle>& sparkles);
+	static std::unique_ptr<Particle> CreateNewRocket(const olc::PixelGameEngine& pge);
+
+	std::vector<std::unique_ptr<Particle>> Update(float fElapsedTime) override;
 
 private:
-	void Explode(std::vector<Particle>& sparkles) const;
+	[[nodiscard]] std::vector<std::unique_ptr<Particle>> Explode() const;
 };
 
 
-#endif //ROCKET_HPP
+#endif //FIREWORKSPGE_ROCKET_HPP

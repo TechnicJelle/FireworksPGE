@@ -1,7 +1,8 @@
-#ifndef FIREWORKSPGE_PARTICLE_H
-#define FIREWORKSPGE_PARTICLE_H
+#ifndef FIREWORKSPGE_PARTICLE_HPP
+#define FIREWORKSPGE_PARTICLE_HPP
 
-#include "olcPixelGameEngine.h"
+
+#include <olcPixelGameEngine.h> //draws with
 
 
 class Particle
@@ -18,21 +19,21 @@ protected:
 	Particle(float x, float y, float fuse, olc::Pixel colour);
 
 public:
-	Particle() = default;
+	Particle();
 
-	static Particle CreateNewSparkle(const olc::vf2d& position, olc::Pixel colour);
+	static std::unique_ptr<Particle> CreateNewSparkle(const olc::vf2d& position, olc::Pixel colour);
 
-	void Update(float fElapsedTime);
+	virtual std::vector<std::unique_ptr<Particle>> Update(float fElapsedTime);
 
 	void Render(olc::PixelGameEngine& pge);
 
 	void ApplyForce(const olc::vf2d& force);
 
-	[[nodiscard]] bool IsExploded() const;
+	[[nodiscard]] bool IsFizzledOut() const;
 
 protected:
 	[[nodiscard]] olc::vf2d GetPosition() const;
 };
 
 
-#endif //FIREWORKSPGE_PARTICLE_H
+#endif //FIREWORKSPGE_PARTICLE_HPP

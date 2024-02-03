@@ -1,4 +1,5 @@
-#include "Rocket.hpp"
+#include "Rocket.hpp" //implements
+
 #include "Utils.h"
 
 Rocket::Rocket(const float x, const float y,
@@ -8,7 +9,7 @@ Rocket::Rocket(const float x, const float y,
 {
 }
 
-Rocket Rocket::CreateNewRocket(const olc::PixelGameEngine& pge)
+std::unique_ptr<Particle> Rocket::CreateNewRocket(const olc::PixelGameEngine& pge)
 {
 	const float x = random(static_cast<float>(pge.ScreenWidth()));
 	const float y = static_cast<float>(pge.ScreenHeight());
@@ -16,28 +17,34 @@ Rocket Rocket::CreateNewRocket(const olc::PixelGameEngine& pge)
 	const float strength = random(6500.0f, 11000.0f);
 	const float fuse = random(strength * 0.0003f, strength * 0.00055f);
 
-	Rocket r(x, y, fuse);
-	r.ApplyForce({0.0f, -strength});
+	auto r = std::make_unique<Rocket>(x, y, fuse);
+	r->ApplyForce({0.0f, -strength});
 	return r;
 }
 
-void Rocket::Update(const float fElapsedTime, std::vector<Particle>& sparkles)
+std::vector<std::unique_ptr<Particle>> Rocket::Update(const float fElapsedTime)
 {
 	Particle::Update(fElapsedTime);
-	if (IsExploded())
+	if (IsFizzledOut())
 	{
-		Explode(sparkles);
+		return Explode();
 	}
+
+	return {};
 }
 
-void Rocket::Explode(std::vector<Particle>& sparkles) const
+std::vector<std::unique_ptr<Particle>> Rocket::Explode() const
 {
+	std::vector<std::unique_ptr<Particle>> newSparkles;
+
 	const olc::Pixel colours[] = {olc::RED, olc::GREEN, olc::BLUE, olc::YELLOW, olc::MAGENTA, olc::CYAN};
 	const olc::Pixel newColour = colours[random(6)];
 
 	for (int i = 0; i < random(10, 20); ++i)
 	{
-		Particle sparkle = CreateNewSparkle(GetPosition(), newColour);
-		sparkles.push_back(sparkle);
+		auto sparkle = CreateNewSparkle(GetPosition(), newColour);
+		newSparkles.push_back(std::move(sparkle));
 	}
+
+	return newSparkles;
 }
