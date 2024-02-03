@@ -109,7 +109,7 @@ private:
 	void PhysicsAndFuseSystem()
 	{
 		const auto physicsView = registry.view<Physics, Renderer>();
-		for (auto [entity, phys, rend] : physicsView.each())
+		physicsView.each([this](const entt::entity entity, Physics& phys, Renderer& rend)
 		{
 			phys.ApplyForce(gravityForce);
 			phys.Update(dt);
@@ -119,13 +119,13 @@ private:
 			{
 				registry.emplace<Expired>(entity);
 			}
-		}
+		});
 	}
 
 	void ExplodeSystem()
 	{
 		const auto explodeView = registry.view<const Expired, const Explode, const Physics>();
-		for (auto [entity, explode, phys] : explodeView.each())
+		explodeView.each([this](const Explode& explode, const Physics& phys)
 		{
 			for (uint8_t i = 0; i < explode.numSparkles; i++)
 			{
@@ -133,25 +133,22 @@ private:
 			}
 
 			CreateNewRocket(registry, *this);
-		}
+		});
 	}
 
 	void CleanupSystem()
 	{
-		const auto expiredView = registry.view<const Expired>();
-		for (auto [entity] : expiredView.each())
-		{
-			registry.destroy(entity);
-		}
+		const auto expiredView = registry.view<Expired>();
+		registry.destroy(std::begin(expiredView), std::end(expiredView));
 	}
 
 	void RenderingSystem()
 	{
-		const auto view = registry.view<const Physics, const Renderer>();
-		for (auto [entity, phys, rend] : view.each())
+		const auto renderView = registry.view<const Physics, const Renderer>();
+		renderView.each([this](const Physics& phys, const Renderer& rend)
 		{
 			Draw(phys.GetPosition(), rend.GetColour());
-		}
+		});
 	}
 
 	bool OnUserUpdate(const float fElapsedTime) override
