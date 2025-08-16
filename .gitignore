@@ -8,3 +8,9 @@ CMakeCache.txt
 CMakeFiles/
 Makefile
 cmake_install.cmake
+linux-build
+emscripten-build
+nmake-build
+mingw-build
+vs-build
+.cache
