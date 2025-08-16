@@ -89,10 +89,11 @@ jobs:
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ env.BUILD_TYPE }} --parallel
     - name: Prepare for Upload
       run: |
-        mkdir upload
-        mv ${{ steps.strings.outputs.build-output-dir }}/bin/* upload/
-        cd upload
-        for f in *; mv $f "index.${f##*.}"
+        UPDIR="upload/${{ github.event.repository.name }}/"
+        mkdir -p $UPDIR
+        mv ${{ steps.strings.outputs.build-output-dir }}/bin/* $UPDIR
+        cd $UPDIR
+        for f in *; do mv $f "index.${f##*.}"; done
     - name: Upload Build
       uses: actions/upload-artifact@v4
       with:
