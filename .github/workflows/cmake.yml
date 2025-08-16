@@ -87,9 +87,14 @@ jobs:
         -G "Ninja"
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ env.BUILD_TYPE }} --parallel
+    - name: Prepare for Upload
+      run: |
+        mkdir upload
+        mv ${{ steps.strings.outputs.build-output-dir }}/bin/* upload/
+        cd upload
+        for f in *; mv $f "index.${f##*.}"
     - name: Upload Build
       uses: actions/upload-artifact@v4
       with:
         name: ${{ github.event.repository.name }}_Web
-        path: ${{ steps.strings.outputs.build-output-dir }}/bin/
-
+        path: upload
