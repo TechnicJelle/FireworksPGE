@@ -93,7 +93,7 @@ jobs:
         mkdir -p $UPDIR
         mv ${{ steps.strings.outputs.build-output-dir }}/bin/* $UPDIR
         cd $UPDIR
-        for f in *; do mv $f "index.${f##*.}"; done
+        for f in *.html; do mv $f "index.${f##*.}"; done
     - name: Upload Build
       uses: actions/upload-artifact@v4
       with:
