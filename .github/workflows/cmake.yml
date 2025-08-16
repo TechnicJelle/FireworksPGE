@@ -61,3 +61,35 @@ jobs:
       with:
         name: ${{ github.event.repository.name }}_Linux
         path: ${{ steps.strings.outputs.build-output-dir }}/bin/
+
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: Install Dependencies
+      run: >
+        sudo apt update &&
+        sudo apt install build-essential cmake git libpng-dev libglu1-mesa-dev
+        ninja-build pulseaudio pulseaudio-utils libpulse-dev
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+    - name: Configure CMake
+      run: >
+        emcmake cmake
+        -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        -S "${{ github.workspace }}"
+        -B "${{ steps.strings.outputs.build-output-dir }}"
+        -G "Ninja"
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ env.BUILD_TYPE }} --parallel
+    - name: Upload Build
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.event.repository.name }}_Web
+        path: ${{ steps.strings.outputs.build-output-dir }}/bin/
+
